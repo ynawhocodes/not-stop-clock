@@ -25,9 +25,47 @@
       font-family: sans-serif;
       font-size: 9px;
       transform: translate(-50%, -50%) rotate(var(--angle));
+      mix-blend-mode: difference;
+
     }
     .number.current {
-      color: red;
+      color: white;
+    }
+    .hand {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.22);
+      transform-origin: bottom center;
+      left: 50%;
+      top: 50%;
+    }
+    .hand.hour {
+      width: 3px;
+      height: 80px;
+      margin-left: -1.5px;
+      margin-top: -80px;
+    }
+    .hand.minute {
+      width: 2px;
+      height: 140px;
+      margin-left: -1px;
+      margin-top: -140px;
+    }
+    .hand.second {
+      width: 1px;
+      height: 200px;
+      margin-left: -0.5px;
+      margin-top: -200px;
+    }
+    .center-dot {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: black;
+      border-radius: 50%;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
     }
   </style>
 </head>
@@ -36,6 +74,10 @@
   <div id="hours" class="ring"></div>
   <div id="minutes" class="ring"></div>
   <div id="seconds" class="ring"></div>
+  <div id="hourHand" class="hand hour"></div>
+  <div id="minuteHand" class="hand minute"></div>
+  <div id="secondHand" class="hand second"></div>
+  <div class="center-dot"></div>
 </div>
 
 <script>
@@ -84,8 +126,23 @@
     document.getElementById('hours').style.transform = `rotate(${-hr * 15}deg)`;
   };
 
+  // 침들의 초기 위치 설정 (현재 시각을 가리키도록)
+  const setHandsPosition = () => {
+    const now = new Date();
+    const koreaTime = new Date(now.getTime() + (9 * 60 * 60 * 1000)); // UTC+9
+    const sec = koreaTime.getUTCSeconds();
+    const min = koreaTime.getUTCMinutes();
+    const hr = koreaTime.getUTCHours();
+
+    // 침들이 빨간 텍스트(현재 시각)를 가리키도록 설정하고 고정
+    document.getElementById('secondHand').style.transform = `rotate(90deg)`;
+    document.getElementById('minuteHand').style.transform = `rotate(90deg)`;
+    document.getElementById('hourHand').style.transform = `rotate(90deg)`;
+  };
+
   setInterval(updateRotation, 1000);
   updateRotation();
+  setHandsPosition(); // 침들은 한 번만 설정하고 고정
 </script>
 </body>
 </html>
