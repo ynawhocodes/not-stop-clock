@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3-Layer Clock</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { background: #fff; height: 100%; overflow: hidden; }
+    .clock-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .ring {
+      position: absolute;
+      transform-origin: center;
+    }
+    .number {
+      position: absolute;
+      color: black;
+      font-family: sans-serif;
+      font-size: 14px;
+      transform: translate(-50%, -50%) rotate(var(--angle));
+    }
+    .number.current {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+<div class="clock-container">
+  <div id="hours" class="ring"></div>
+  <div id="minutes" class="ring"></div>
+  <div id="seconds" class="ring"></div>
+</div>
+
+<script>
+  const placeNumbers = (elementId, count, radius) => {
+    const ring = document.getElementById(elementId);
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * 2 * Math.PI;
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius;
+      const num = document.createElement('div');
+      num.className = 'number';
+      num.textContent = i.toString().padStart(2, '0');
+      num.style.left = `${x}px`;
+      num.style.top = `${y}px`;
+      num.style.setProperty('--angle', `${angle}rad`);
+      ring.appendChild(num);
+    }
+  };
+
+  placeNumbers('hours', 24, 80);
+  placeNumbers('minutes', 60, 140);
+  placeNumbers('seconds', 60, 200);
+
+  const updateRotation = () => {
+    // 한국 시간 기준으로 현재 시각 가져오기
+    const now = new Date();
+    const koreaTime = new Date(now.getTime() + (9 * 60 * 60 * 1000)); // UTC+9
+    const sec = koreaTime.getUTCSeconds();
+    const min = koreaTime.getUTCMinutes();
+    const hr = koreaTime.getUTCHours();
+
+    // 모든 숫자의 현재 시각 표시 제거
+    document.querySelectorAll('.number').forEach(num => num.classList.remove('current'));
+
+    // 현재 시각에 해당하는 숫자들을 빨간색으로 표시
+    const hourNumbers = document.getElementById('hours').children;
+    const minuteNumbers = document.getElementById('minutes').children;
+    const secondNumbers = document.getElementById('seconds').children;
+
+    if (hourNumbers[hr]) hourNumbers[hr].classList.add('current');
+    if (minuteNumbers[min]) minuteNumbers[min].classList.add('current');
+    if (secondNumbers[sec]) secondNumbers[sec].classList.add('current');
+
+    document.getElementById('seconds').style.transform = `rotate(${-sec * 6}deg)`;
+    document.getElementById('minutes').style.transform = `rotate(${-min * 6}deg)`;
+    document.getElementById('hours').style.transform = `rotate(${-hr * 15}deg)`;
+  };
+
+  setInterval(updateRotation, 1000);
+  updateRotation();
+</script>
+</body>
+</html>
